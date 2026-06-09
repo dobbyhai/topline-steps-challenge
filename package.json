@@ -1,0 +1,12 @@
+{
+  "name": "team-steps-challenge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Simple local web app for a friendly team steps challenge.",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check app.js && node --check server.js",
+    "build": "mkdir -p dist && cp index.html styles.css app.js server.js package.json dist/"
+  },
+  "license": "UNLICENSED"
+}

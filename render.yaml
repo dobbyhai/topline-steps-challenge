@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: topline-steps-challenge
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: ADMIN_PIN
+        sync: false
+    disk:
+      name: steps-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
