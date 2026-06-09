@@ -183,7 +183,7 @@ function titleCaseName(name) {
 }
 
 function sampleEntries() {
-  const names = ["Hai", "Liz", "Alex", "Priya", "Jordan"];
+  const names = ["Summer", "Liz", "Alex", "Priya", "Jordan"];
   const start = new Date();
   start.setDate(start.getDate() - 9);
   return names.flatMap((name, personIndex) =>
