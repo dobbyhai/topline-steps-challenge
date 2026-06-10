@@ -6,7 +6,7 @@ const FORM_FIELDS = {
   dateDay: "entry.1784503650_day",
   steps: "entry.1711485762",
 };
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1EXZlrBFPoThMQuAb6JT_SAggoTvhRbaHe4s10BBjvjk/gviz/tq?tqx=out:csv&sheet=Form%20Responses%201";
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1EXZlrBFPoThMQuAb6JT_SAggoTvhRbaHe4s10BBjvjk/gviz/tq?tqx=out:csv&sheet=Form%20Responses%202";
 
 const $ = (id) => document.getElementById(id);
 const state = { entries: [] };
