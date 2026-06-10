@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Topline Steps Challenge</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero card">
+        <div>
+          <p class="eyebrow">Topline Team</p>
+          <h1>Steps Challenge</h1>
+          <p class="lede">Submit daily steps, celebrate weekly winners, and track the overall winner by average steps.</p>
+        </div>
+        <div class="hero-stats" aria-label="Challenge summary">
+          <div><strong id="totalParticipants">0</strong><span>teammates</span></div>
+          <div><strong id="totalEntries">0</strong><span>submissions</span></div>
+          <div><strong id="overallPace">0</strong><span>avg steps/day</span></div>
+        </div>
+      </section>
+
+      <section class="grid two-cols">
+        <form id="entryForm" class="card form-card">
+          <div class="section-title">
+            <p class="eyebrow">Daily submission</p>
+            <h2>Add steps</h2>
+          </div>
+          <label>
+            Name
+            <input id="nameInput" name="name" type="text" placeholder="e.g. Summer" autocomplete="name" required />
+          </label>
+          <label>
+            Date
+            <input id="dateInput" name="date" type="date" required />
+          </label>
+          <label>
+            Steps
+            <input id="stepsInput" name="steps" type="number" min="0" step="1" placeholder="10482" required />
+          </label>
+          <button type="submit">Save submission</button>
+          <p class="hint">Submitting again for the same name and date will update that entry. Averages are based only on days submitted.</p>
+        </form>
+
+        <section class="card rules-card">
+          <div class="section-title">
+            <p class="eyebrow">Rules</p>
+            <h2>Friendly competition, low admin</h2>
+          </div>
+          <ul>
+            <li>Track steps from Apple Health, Fitbit, Google Fit, iPhone — anything.</li>
+            <li>Weekly winner gets bragging rights.</li>
+            <li>Overall challenge period: June 15, 2026 (Monday) through August 6, 2026 (Thursday).</li>
+            <li>Overall winner is highest average steps across the full challenge.</li>
+            <li>Averages only count submitted days, so missing one day does not tank anyone.</li>
+          </ul>
+          <label>
+            Admin PIN
+            <input id="adminPinInput" name="adminPin" type="password" placeholder="Required for import/reset/delete" autocomplete="off" />
+          </label>
+          <div class="tools">
+            <button id="refreshBtn" type="button" class="secondary">Refresh</button>
+            <button id="exportBtn" type="button" class="secondary">Export data</button>
+            <label class="secondary file-btn">
+              Import data
+              <input id="importInput" type="file" accept="application/json" />
+            </label>
+            <button id="resetBtn" type="button" class="danger">Reset</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="grid two-cols leaderboard-grid">
+        <section class="card">
+          <div class="section-title row-title">
+            <div>
+              <p class="eyebrow">Overall</p>
+              <h2>Average steps leaderboard</h2>
+            </div>
+            <span id="overallWinner" class="pill">No winner yet</span>
+          </div>
+          <div id="overallLeaderboard" class="leaderboard empty">No submissions yet.</div>
+        </section>
+
+        <section class="card">
+          <div class="section-title row-title">
+            <div>
+              <p class="eyebrow">Weekly</p>
+              <h2>Week leaderboard</h2>
+            </div>
+            <select id="weekSelect" aria-label="Select week"></select>
+          </div>
+          <div id="weeklyLeaderboard" class="leaderboard empty">No submissions yet.</div>
+        </section>
+      </section>
+
+      <section class="card">
+        <div class="section-title row-title">
+          <div>
+            <p class="eyebrow">Log</p>
+            <h2>Recent submissions</h2>
+          </div>
+          <button id="sampleBtn" type="button" class="secondary">Load sample data</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Steps</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="entriesBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <script src="static-form-app.js"></script>
+  </body>
+</html>
