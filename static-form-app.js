@@ -150,9 +150,17 @@ function normalizeEntries(entries) {
 }
 
 function titleCaseName(name) { return name.replace(/\s+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()); }
+function isWithinChallengePeriod(entry) {
+  return entry.date >= CHALLENGE_START && entry.date <= CHALLENGE_END;
+}
+
+function isLeaderboardEntry(entry) {
+  return entry.steps > 0;
+}
+
 function groupStats(entries) {
   const stats = new Map();
-  for (const entry of entries) {
+  for (const entry of entries.filter(isLeaderboardEntry)) {
     const current = stats.get(entry.name) || { name: entry.name, total: 0, days: 0, best: 0 };
     current.total += entry.steps;
     current.days += 1;
@@ -192,16 +200,17 @@ function weekSortValue(key) {
 }
 function render() { renderSummary(); renderWeekOptions(); renderOverallLeaderboard(); renderWeeklyLeaderboard(); renderEntries(); }
 function renderSummary() {
-  const people = new Set(state.entries.map((entry) => entry.name));
-  const overall = groupStats(state.entries);
+  const activeChallengeEntries = state.entries.filter((entry) => isLeaderboardEntry(entry) && isWithinChallengePeriod(entry));
+  const people = new Set(activeChallengeEntries.map((entry) => entry.name));
+  const overall = groupStats(activeChallengeEntries);
   $("totalParticipants").textContent = people.size;
-  $("totalEntries").textContent = state.entries.length;
+  $("totalEntries").textContent = activeChallengeEntries.length;
   $("overallPace").textContent = overall.length ? formatNumber(Math.round(overall.reduce((sum, item) => sum + item.average, 0) / overall.length)) : "0";
 }
 function renderWeekOptions() {
   const select = $("weekSelect");
   const previous = select.value;
-  const weeks = [...new Set(state.entries.map((entry) => challengeWeekKey(entry.date)))].sort((a, b) => weekSortValue(b) - weekSortValue(a));
+  const weeks = [...new Set(state.entries.filter(isLeaderboardEntry).map((entry) => challengeWeekKey(entry.date)))].sort((a, b) => weekSortValue(b) - weekSortValue(a));
   select.innerHTML = "";
   if (!weeks.length) { select.innerHTML = '<option value="">No weeks yet</option>'; return; }
   for (const week of weeks) {
@@ -211,13 +220,13 @@ function renderWeekOptions() {
   select.value = weeks.includes(previous) ? previous : weeks[0];
 }
 function renderOverallLeaderboard() {
-  const stats = groupStats(state.entries);
+  const stats = groupStats(state.entries.filter(isWithinChallengePeriod));
   $("overallWinner").textContent = stats[0] ? `👑 ${stats[0].name}` : "No winner yet";
   renderLeaderboard($("overallLeaderboard"), stats, "average");
 }
 function renderWeeklyLeaderboard() {
   const week = $("weekSelect").value;
-  const entries = week ? state.entries.filter((entry) => challengeWeekKey(entry.date) === week) : [];
+  const entries = week ? state.entries.filter((entry) => isLeaderboardEntry(entry) && challengeWeekKey(entry.date) === week) : [];
   renderLeaderboard($("weeklyLeaderboard"), groupStats(entries), "total");
 }
 function renderLeaderboard(container, stats, primaryMetric) {
