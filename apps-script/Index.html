@@ -201,6 +201,8 @@ const $ = (id) => document.getElementById(id);
 const state = { entries: [] };
 const ADMIN_PIN_STORAGE_KEY = "toplineStepsChallengeAdminPin:v1";
 const today = new Date().toISOString().slice(0, 10);
+const CHALLENGE_START = "2026-06-15";
+const CHALLENGE_END = "2026-08-06";
 $("dateInput").value = today;
 $("adminPinInput").value = sessionStorage.getItem(ADMIN_PIN_STORAGE_KEY) || "";
 $("adminPinInput").addEventListener("input", () => sessionStorage.setItem(ADMIN_PIN_STORAGE_KEY, $("adminPinInput").value));
@@ -314,15 +316,36 @@ function groupStats(entries) {
     .sort((a, b) => b.average - a.average || b.total - a.total || a.name.localeCompare(b.name));
 }
 
-function isoWeekKey(dateString) {
+function challengeWeekKey(dateString) {
   const date = new Date(`${dateString}T00:00:00`);
-  const day = date.getDay() || 7;
-  date.setDate(date.getDate() + 4 - day);
-  const yearStart = new Date(date.getFullYear(), 0, 1);
-  const week = Math.ceil(((date - yearStart) / 86400000 + 1) / 7);
-  return `${date.getFullYear()}-W${String(week).padStart(2, "0")}`;
+  const start = new Date(`${CHALLENGE_START}T00:00:00`);
+  const end = new Date(`${CHALLENGE_END}T00:00:00`);
+  if (date < start) return "pre-challenge";
+  if (date > end) return "post-challenge";
+  const dayOffset = Math.floor((date - start) / 86400000);
+  const weekNumber = Math.floor(dayOffset / 7) + 1;
+  return `challenge-week-${weekNumber}`;
 }
-function weekLabel(key) { const [year, weekPart] = key.split("-W"); return `Week ${Number(weekPart)}, ${year}`; }
+
+function weekLabel(key) {
+  if (key === "pre-challenge") return "Pre-challenge";
+  if (key === "post-challenge") return "Post-challenge";
+  const weekNumber = Number(key.replace("challenge-week-", ""));
+  const start = new Date(`${CHALLENGE_START}T00:00:00`);
+  const end = new Date(`${CHALLENGE_END}T00:00:00`);
+  const weekStart = new Date(start);
+  weekStart.setDate(start.getDate() + (weekNumber - 1) * 7);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  const cappedWeekEnd = weekEnd > end ? end : weekEnd;
+  return `Challenge Week ${weekNumber} (${formatShortDate(weekStart)}–${formatShortDate(cappedWeekEnd)})`;
+}
+
+function weekSortValue(key) {
+  if (key === "pre-challenge") return 0;
+  if (key === "post-challenge") return 999;
+  return Number(key.replace("challenge-week-", ""));
+}
 
 function render() {
   state.entries = normalizeEntries(state.entries);
@@ -338,7 +361,7 @@ function renderSummary() {
 function renderWeekOptions() {
   const select = $("weekSelect");
   const previous = select.value;
-  const weeks = [...new Set(state.entries.map((entry) => isoWeekKey(entry.date)))].sort().reverse();
+  const weeks = [...new Set(state.entries.map((entry) => challengeWeekKey(entry.date)))].sort((a, b) => weekSortValue(b) - weekSortValue(a));
   select.innerHTML = "";
   if (!weeks.length) { select.innerHTML = '<option value="">No weeks yet</option>'; return; }
   for (const week of weeks) {
@@ -354,7 +377,7 @@ function renderOverallLeaderboard() {
 }
 function renderWeeklyLeaderboard() {
   const week = $("weekSelect").value;
-  const entries = week ? state.entries.filter((entry) => isoWeekKey(entry.date) === week) : [];
+  const entries = week ? state.entries.filter((entry) => challengeWeekKey(entry.date) === week) : [];
   renderLeaderboard($("weeklyLeaderboard"), groupStats(entries), "total");
 }
 function renderLeaderboard(container, stats, primaryMetric) {
@@ -376,6 +399,7 @@ function renderEntries() {
 }
 function formatNumber(value) { return new Intl.NumberFormat("en-US").format(value); }
 function formatDate(dateString) { return new Date(`${dateString}T00:00:00`).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
+function formatShortDate(date) { return date.toLocaleDateString(undefined, { month: "short", day: "numeric" }); }
 function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]); }
 
 </script>
