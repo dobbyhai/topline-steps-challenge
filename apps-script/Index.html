@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Topline Steps Challenge</title>
+    <style>
+:root {
+  color-scheme: light;
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #e4e7ec;
+  --brand: #246bfe;
+  --brand-dark: #174fc2;
+  --green: #12b76a;
+  --red: #d92d20;
+  --shadow: 0 18px 50px rgba(17, 24, 39, 0.08);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top left, rgba(36, 107, 254, 0.15), transparent 32rem), linear-gradient(180deg, #fbfcff 0%, var(--bg) 100%);
+  color: var(--ink);
+}
+.shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 48px; }
+.card { background: rgba(255,255,255,0.9); border: 1px solid var(--line); border-radius: 28px; box-shadow: var(--shadow); padding: 24px; backdrop-filter: blur(16px); }
+.hero { display: flex; align-items: stretch; justify-content: space-between; gap: 24px; margin-bottom: 20px; background: linear-gradient(135deg, #ffffff 0%, #eef4ff 100%); }
+.eyebrow { margin: 0 0 8px; color: var(--brand); font-size: 0.77rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+h1, h2 { margin: 0; letter-spacing: -0.04em; }
+h1 { font-size: clamp(2.5rem, 7vw, 5.6rem); line-height: 0.92; }
+h2 { font-size: 1.3rem; }
+.lede { max-width: 680px; margin: 16px 0 0; color: var(--muted); font-size: 1.08rem; line-height: 1.6; }
+.hero-stats { min-width: 320px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.hero-stats div { display: grid; place-items: center; text-align: center; border-radius: 22px; background: white; border: 1px solid var(--line); padding: 18px 10px; }
+.hero-stats strong { font-size: 1.8rem; letter-spacing: -0.04em; }
+.hero-stats span { color: var(--muted); font-size: 0.82rem; }
+.grid { display: grid; gap: 20px; margin-top: 20px; }
+.two-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.section-title { margin-bottom: 18px; }
+.row-title { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+form { display: grid; gap: 14px; }
+label { display: grid; gap: 7px; color: #344054; font-weight: 700; font-size: 0.94rem; }
+input, select { width: 100%; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; font: inherit; background: white; color: var(--ink); }
+input:focus, select:focus { outline: 3px solid rgba(36, 107, 254, 0.16); border-color: var(--brand); }
+button, .file-btn { border: 0; border-radius: 16px; padding: 12px 16px; font: inherit; font-weight: 800; color: white; background: var(--brand); cursor: pointer; transition: transform 0.15s ease, background 0.15s ease; text-align: center; }
+button:hover, .file-btn:hover { transform: translateY(-1px); background: var(--brand-dark); }
+.secondary { background: #eef4ff; color: var(--brand-dark); border: 1px solid #c7d7fe; }
+.secondary:hover { background: #dce8ff; }
+.danger { background: #fff1f0; color: var(--red); border: 1px solid #ffccc7; }
+.danger:hover { background: #ffe4e1; }
+.hint, .rules-card li { color: var(--muted); line-height: 1.5; }
+ul { padding-left: 1.2rem; margin: 0; display: grid; gap: 10px; }
+.tools { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.file-btn input { display: none; }
+.pill { display: inline-flex; align-items: center; min-height: 34px; padding: 6px 12px; border-radius: 999px; background: #ecfdf3; color: #027a48; font-size: 0.86rem; font-weight: 800; white-space: nowrap; }
+.leaderboard { display: grid; gap: 10px; }
+.empty { color: var(--muted); padding: 16px 0; }
+.rank-row { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 13px; border: 1px solid var(--line); border-radius: 18px; background: #fbfcff; }
+.medal { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 999px; background: #eef4ff; font-weight: 900; }
+.rank-row:first-child .medal { background: #fff4d6; color: #b54708; }
+.person strong { display: block; }
+.person span, .metric span { color: var(--muted); font-size: 0.84rem; }
+.metric { text-align: right; font-weight: 900; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 620px; }
+th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+th { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
+td:last-child { text-align: right; }
+.delete-btn { padding: 8px 10px; border-radius: 12px; }
+@media (max-width: 850px) {
+  .hero, .two-cols { grid-template-columns: 1fr; display: grid; }
+  .hero-stats { min-width: 0; }
+  .row-title { align-items: flex-start; flex-direction: column; }
+}
+@media (max-width: 560px) {
+  .shell { width: min(100% - 20px, 1180px); padding-top: 18px; }
+  .card { border-radius: 22px; padding: 18px; }
+  .hero-stats { grid-template-columns: 1fr; }
+}
+
+</style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero card">
+        <div>
+          <p class="eyebrow">Topline Team</p>
+          <h1>Steps Challenge</h1>
+          <p class="lede">Submit daily steps, celebrate weekly winners, and track the overall winner by average steps.</p>
+        </div>
+        <div class="hero-stats" aria-label="Challenge summary">
+          <div><strong id="totalParticipants">0</strong><span>teammates</span></div>
+          <div><strong id="totalEntries">0</strong><span>submissions</span></div>
+          <div><strong id="overallPace">0</strong><span>avg steps/day</span></div>
+        </div>
+      </section>
+
+      <section class="grid two-cols">
+        <form id="entryForm" class="card form-card">
+          <div class="section-title">
+            <p class="eyebrow">Daily submission</p>
+            <h2>Add steps</h2>
+          </div>
+          <label>
+            Name
+            <input id="nameInput" name="name" type="text" placeholder="e.g. Summer" autocomplete="name" required />
+          </label>
+          <label>
+            Date
+            <input id="dateInput" name="date" type="date" required />
+          </label>
+          <label>
+            Steps
+            <input id="stepsInput" name="steps" type="number" min="0" step="1" placeholder="10482" required />
+          </label>
+          <button type="submit">Save submission</button>
+          <p class="hint">If someone submits the same date again, this updates that day for everyone. Missed days are ignored in averages.</p>
+        </form>
+
+        <section class="card rules-card">
+          <div class="section-title">
+            <p class="eyebrow">Rules</p>
+            <h2>Friendly competition, low admin</h2>
+          </div>
+          <ul>
+            <li>Track steps from Apple Health, Fitbit, Google Fit, iPhone — anything.</li>
+            <li>Weekly winner gets bragging rights.</li>
+            <li>Overall winner is highest average steps across the full challenge.</li>
+            <li>Averages only count submitted days, so missing one day does not tank anyone.</li>
+          </ul>
+          <label>
+            Admin PIN
+            <input id="adminPinInput" name="adminPin" type="password" placeholder="Required for import/reset/delete" autocomplete="off" />
+          </label>
+          <div class="tools">
+            <button id="refreshBtn" type="button" class="secondary">Refresh</button>
+            <button id="exportBtn" type="button" class="secondary">Export data</button>
+            <label class="secondary file-btn">
+              Import data
+              <input id="importInput" type="file" accept="application/json" />
+            </label>
+            <button id="resetBtn" type="button" class="danger">Reset</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="grid two-cols leaderboard-grid">
+        <section class="card">
+          <div class="section-title row-title">
+            <div>
+              <p class="eyebrow">Overall</p>
+              <h2>Average steps leaderboard</h2>
+            </div>
+            <span id="overallWinner" class="pill">No winner yet</span>
+          </div>
+          <div id="overallLeaderboard" class="leaderboard empty">No submissions yet.</div>
+        </section>
+
+        <section class="card">
+          <div class="section-title row-title">
+            <div>
+              <p class="eyebrow">Weekly</p>
+              <h2>Week leaderboard</h2>
+            </div>
+            <select id="weekSelect" aria-label="Select week"></select>
+          </div>
+          <div id="weeklyLeaderboard" class="leaderboard empty">No submissions yet.</div>
+        </section>
+      </section>
+
+      <section class="card">
+        <div class="section-title row-title">
+          <div>
+            <p class="eyebrow">Log</p>
+            <h2>Recent submissions</h2>
+          </div>
+          <button id="sampleBtn" type="button" class="secondary">Load sample data</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Steps</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="entriesBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <script>
+const $ = (id) => document.getElementById(id);
+const state = { entries: [] };
+const ADMIN_PIN_STORAGE_KEY = "toplineStepsChallengeAdminPin:v1";
+const today = new Date().toISOString().slice(0, 10);
+$("dateInput").value = today;
+$("adminPinInput").value = sessionStorage.getItem(ADMIN_PIN_STORAGE_KEY) || "";
+$("adminPinInput").addEventListener("input", () => sessionStorage.setItem(ADMIN_PIN_STORAGE_KEY, $("adminPinInput").value));
+
+init();
+
+$("entryForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const name = $("nameInput").value.trim();
+  const date = $("dateInput").value;
+  const steps = Number.parseInt($("stepsInput").value, 10);
+  if (!name || !date || !Number.isFinite(steps) || steps < 0) return;
+
+  await gasRun("submitEntry", { name, date, steps });
+  $("stepsInput").value = "";
+  $("nameInput").value = titleCaseName(name);
+  await loadEntries();
+});
+
+$("refreshBtn").addEventListener("click", loadEntries);
+
+$("exportBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), entries: state.entries }, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `topline-steps-${today}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+});
+
+$("importInput").addEventListener("change", async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  const payload = JSON.parse(await file.text());
+  const entries = Array.isArray(payload) ? payload : payload.entries;
+  await gasRun("importEntries", { adminPin: adminPin(), entries });
+  event.target.value = "";
+  await loadEntries();
+});
+
+$("resetBtn").addEventListener("click", async () => {
+  if (!confirm("Reset all shared submissions? Export first if you need a backup.")) return;
+  await gasRun("resetEntries", { adminPin: adminPin() });
+  await loadEntries();
+});
+
+$("sampleBtn").addEventListener("click", async () => {
+  await gasRun("loadSampleEntries", { adminPin: adminPin() });
+  await loadEntries();
+});
+
+$("weekSelect").addEventListener("change", renderWeeklyLeaderboard);
+
+async function init() {
+  await loadEntries();
+  setInterval(loadEntries, 30000);
+}
+
+async function loadEntries() {
+  const entries = await gasRun("getEntries");
+  state.entries = normalizeEntries(entries);
+  render();
+}
+
+function adminPin() {
+  const pin = $("adminPinInput").value.trim();
+  if (!pin) {
+    alert("Enter the admin PIN first.");
+    throw new Error("Admin PIN required");
+  }
+  return pin;
+}
+
+function gasRun(functionName, ...args) {
+  return new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler(resolve)
+      .withFailureHandler((error) => {
+        alert(error.message || "Request failed");
+        reject(error);
+      })[functionName](...args);
+  });
+}
+
+function normalizeEntries(entries) {
+  return (Array.isArray(entries) ? entries : [])
+    .map((entry) => ({
+      id: entry.id || crypto.randomUUID(),
+      name: titleCaseName(String(entry.name || "").trim()),
+      date: String(entry.date || ""),
+      steps: Number.parseInt(entry.steps, 10),
+      updatedAt: entry.updatedAt || new Date().toISOString(),
+    }))
+    .filter((entry) => entry.name && /^\d{4}-\d{2}-\d{2}$/.test(entry.date) && Number.isFinite(entry.steps) && entry.steps >= 0)
+    .sort((a, b) => b.date.localeCompare(a.date) || a.name.localeCompare(b.name));
+}
+
+function titleCaseName(name) { return name.replace(/\s+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()); }
+
+function groupStats(entries) {
+  const stats = new Map();
+  for (const entry of entries) {
+    const current = stats.get(entry.name) || { name: entry.name, total: 0, days: 0, best: 0 };
+    current.total += entry.steps;
+    current.days += 1;
+    current.best = Math.max(current.best, entry.steps);
+    stats.set(entry.name, current);
+  }
+  return [...stats.values()].map((person) => ({ ...person, average: Math.round(person.total / person.days) }))
+    .sort((a, b) => b.average - a.average || b.total - a.total || a.name.localeCompare(b.name));
+}
+
+function isoWeekKey(dateString) {
+  const date = new Date(`${dateString}T00:00:00`);
+  const day = date.getDay() || 7;
+  date.setDate(date.getDate() + 4 - day);
+  const yearStart = new Date(date.getFullYear(), 0, 1);
+  const week = Math.ceil(((date - yearStart) / 86400000 + 1) / 7);
+  return `${date.getFullYear()}-W${String(week).padStart(2, "0")}`;
+}
+function weekLabel(key) { const [year, weekPart] = key.split("-W"); return `Week ${Number(weekPart)}, ${year}`; }
+
+function render() {
+  state.entries = normalizeEntries(state.entries);
+  renderSummary(); renderWeekOptions(); renderOverallLeaderboard(); renderWeeklyLeaderboard(); renderEntries();
+}
+function renderSummary() {
+  const people = new Set(state.entries.map((entry) => entry.name));
+  const overall = groupStats(state.entries);
+  $("totalParticipants").textContent = people.size;
+  $("totalEntries").textContent = state.entries.length;
+  $("overallPace").textContent = overall.length ? formatNumber(Math.round(overall.reduce((sum, item) => sum + item.average, 0) / overall.length)) : "0";
+}
+function renderWeekOptions() {
+  const select = $("weekSelect");
+  const previous = select.value;
+  const weeks = [...new Set(state.entries.map((entry) => isoWeekKey(entry.date)))].sort().reverse();
+  select.innerHTML = "";
+  if (!weeks.length) { select.innerHTML = '<option value="">No weeks yet</option>'; return; }
+  for (const week of weeks) {
+    const option = document.createElement("option");
+    option.value = week; option.textContent = weekLabel(week); select.append(option);
+  }
+  select.value = weeks.includes(previous) ? previous : weeks[0];
+}
+function renderOverallLeaderboard() {
+  const stats = groupStats(state.entries);
+  $("overallWinner").textContent = stats[0] ? `👑 ${stats[0].name}` : "No winner yet";
+  renderLeaderboard($("overallLeaderboard"), stats, "average");
+}
+function renderWeeklyLeaderboard() {
+  const week = $("weekSelect").value;
+  const entries = week ? state.entries.filter((entry) => isoWeekKey(entry.date) === week) : [];
+  renderLeaderboard($("weeklyLeaderboard"), groupStats(entries), "total");
+}
+function renderLeaderboard(container, stats, primaryMetric) {
+  if (!stats.length) { container.className = "leaderboard empty"; container.textContent = "No submissions yet."; return; }
+  container.className = "leaderboard";
+  container.innerHTML = stats.map((person, index) => {
+    const metric = primaryMetric === "total" ? person.total : person.average;
+    const metricLabel = primaryMetric === "total" ? "weekly total" : "avg / submitted day";
+    return `<div class="rank-row"><div class="medal">${index + 1}</div><div class="person"><strong>${escapeHtml(person.name)}</strong><span>${person.days} submitted day${person.days === 1 ? "" : "s"} · best ${formatNumber(person.best)}</span></div><div class="metric">${formatNumber(metric)}<br><span>${metricLabel}</span></div></div>`;
+  }).join("");
+}
+function renderEntries() {
+  const body = $("entriesBody");
+  if (!state.entries.length) { body.innerHTML = '<tr><td colspan="4">No submissions yet.</td></tr>'; return; }
+  body.innerHTML = state.entries.map((entry) => `<tr><td>${escapeHtml(entry.name)}</td><td>${formatDate(entry.date)}</td><td>${formatNumber(entry.steps)}</td><td><button class="danger delete-btn" type="button" data-delete="${entry.id}">Delete</button></td></tr>`).join("");
+  body.querySelectorAll("[data-delete]").forEach((button) => {
+    button.addEventListener("click", async () => { await gasRun("deleteEntry", { adminPin: adminPin(), id: button.dataset.delete }); await loadEntries(); });
+  });
+}
+function formatNumber(value) { return new Intl.NumberFormat("en-US").format(value); }
+function formatDate(dateString) { return new Date(`${dateString}T00:00:00`).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
+function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]); }
+
+</script>
+  </body>
+</html>
