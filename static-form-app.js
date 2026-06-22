@@ -158,7 +158,7 @@ function isLeaderboardEntry(entry) {
   return entry.steps > 0;
 }
 
-function groupStats(entries) {
+function groupStats(entries, sortBy = "average") {
   const stats = new Map();
   for (const entry of entries.filter(isLeaderboardEntry)) {
     const current = stats.get(entry.name) || { name: entry.name, total: 0, days: 0, best: 0 };
@@ -168,7 +168,10 @@ function groupStats(entries) {
     stats.set(entry.name, current);
   }
   return [...stats.values()].map((person) => ({ ...person, average: Math.round(person.total / person.days) }))
-    .sort((a, b) => b.average - a.average || b.total - a.total || a.name.localeCompare(b.name));
+    .sort((a, b) => {
+      if (sortBy === "total") return b.total - a.total || b.average - a.average || a.name.localeCompare(b.name);
+      return b.average - a.average || b.total - a.total || a.name.localeCompare(b.name);
+    });
 }
 function challengeWeekKey(dateString) {
   const date = new Date(`${dateString}T00:00:00`);
@@ -227,7 +230,7 @@ function renderOverallLeaderboard() {
 function renderWeeklyLeaderboard() {
   const week = $("weekSelect").value;
   const entries = week ? state.entries.filter((entry) => isLeaderboardEntry(entry) && challengeWeekKey(entry.date) === week) : [];
-  renderLeaderboard($("weeklyLeaderboard"), groupStats(entries), "total");
+  renderLeaderboard($("weeklyLeaderboard"), groupStats(entries, "total"), "total");
 }
 function renderLeaderboard(container, stats, primaryMetric) {
   if (!stats.length) { container.className = "leaderboard empty"; container.textContent = "No submissions yet."; return; }
