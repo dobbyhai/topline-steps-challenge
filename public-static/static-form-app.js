@@ -78,15 +78,53 @@ async function submitToGoogleForm({ name, date, steps }) {
 
 async function loadEntries() {
   try {
-    const response = await fetch(`${SHEET_CSV_URL}&cacheBust=${Date.now()}`);
-    if (!response.ok) throw new Error(`CSV returned ${response.status}`);
-    const csv = await response.text();
-    state.entries = normalizeEntries(rowsFromCsv(csv));
+    state.entries = normalizeEntries(await loadRowsFromGoogleSheet());
     render();
   } catch (error) {
     console.warn(error);
     render();
   }
+}
+
+function loadRowsFromGoogleSheet() {
+  return new Promise((resolve, reject) => {
+    const callbackName = `toplineSteps${Date.now()}${Math.floor(Math.random() * 100000)}`;
+    const script = document.createElement("script");
+    const cleanup = () => {
+      delete window[callbackName];
+      script.remove();
+    };
+
+    window[callbackName] = (response) => {
+      cleanup();
+      if (!response || response.status !== "ok") {
+        reject(new Error(response && response.errors ? response.errors.map((item) => item.detailed_message || item.message).join(", ") : "Sheet JSONP failed"));
+        return;
+      }
+      resolve(rowsFromGoogleTable(response.table));
+    };
+
+    script.onerror = () => { cleanup(); reject(new Error("Sheet JSONP request failed")); };
+    script.src = `${SHEET_CSV_URL.replace("out:csv", `out:json;responseHandler:${callbackName}`)}&cacheBust=${Date.now()}`;
+    document.head.append(script);
+  });
+}
+
+function rowsFromGoogleTable(table) {
+  const headers = (table.cols || []).map((column) => String(column.label || "").trim().toLowerCase());
+  return (table.rows || []).map((row, index) => {
+    const get = (name) => {
+      const cell = (row.c || [])[headers.indexOf(name.toLowerCase())] || {};
+      return cell.f ?? cell.v ?? "";
+    };
+    return {
+      id: `${get("Timestamp")}-${get("Name")}-${get("Date")}-${index}`,
+      name: get("Name"),
+      date: normalizeDate(get("Date")),
+      steps: get("Steps"),
+      updatedAt: get("Timestamp"),
+    };
+  });
 }
 
 function rowsFromCsv(csv) {
